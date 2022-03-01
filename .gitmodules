@@ -1,0 +1,6 @@
+[submodule "china-geojson"]
+	path = china-geojson
+	url = git@github.com:ylxdzsw-vault/china-geojson.git
+[submodule "ChinaCityStat"]
+	path = ChinaCityStat
+	url = git@github.com:ylxdzsw-vault/ChinaCityStat.git
