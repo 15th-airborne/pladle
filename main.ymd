@@ -1,0 +1,34 @@
+<!doctype html>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="author" content="ylxdzsw@gmail.com">
+<meta charset="utf-8">
+
+<title>地兜</title>
+
+[require](main.less)
+
+<script>
+window.places = [require](places.json)
+</script>
+
+<p>
+规则:<br>
+1. 猜一个常住人口超过100万的县级市及以上的地名；<br>
+2. 地名不包含作为后缀的“市”、“民族自治区”、“盟”等字；<br>
+3. 在猜错后会给出提示，例如该地与答案在地理位置和名称上的关系等，鼠标放在提示上会有详细说明；<br>
+4. 答案每日随机生成；<br>
+5. 所有数据来自互联网，不保证其准确性、完整性或时效性。<br>
+参考地图: [link](http://datav.aliyun.com/portal/school/atlas/area_selector)
+</p>
+
+<div id="history">
+
+</div>
+ 
+<input id="input"></input>
+<button id="submit">提交</button>
+<p id="status"><p>
+
+[require](main.js)
+
+[mixin] common.ymd
