@@ -26,6 +26,7 @@ $("#submit").addEventListener("click", () => {
             <span class="guess">${p.short_name}</span> <span class="tag-4">猜对了！</span>
         `.trim()
         $("#history").append(result_element)
+        $("#pixel").className = ""
     } else {
         let html = `<span class="guess">${p.short_name}</span>`
         for (const tag of tags)
@@ -34,6 +35,19 @@ $("#submit").addEventListener("click", () => {
         result_element.innerHTML = html.trim()
         $("#history").append(result_element)
     }
+})
+
+$("#pixel").addEventListener("click", () => {
+    function rep(node) {
+        for (const child of node.childNodes) {
+            if (child.nodeName == "#text")
+                child.textContent = child.textContent.replace(/\S/g, "█")
+            else
+                rep(child)
+        }
+    }
+
+    rep($("#history"))
 })
 
 function get_tags(p) {
@@ -52,8 +66,11 @@ function get_tags(p) {
         case !(dist < 500):
             tags.push({name: "较近", rarity: 2, explaination: "该地与答案直线距离小于 500 千米"})
             break
+        case !(dist < 1000):
+            tags.push({name: "较远", rarity: 2, explaination: "该地与答案直线距离小于 1000 千米"})
+            break
         default:
-            tags.push({name: "较远", rarity: 1, explaination: "该地与答案直线距离大于 500 千米"})
+            tags.push({name: "很远", rarity: 1, explaination: "该地与答案直线距离大于 1000 千米"})
     }
 
     // 2. name
