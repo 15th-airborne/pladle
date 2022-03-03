@@ -102,6 +102,19 @@ function get_tags(p) {
             return tags.push({name: "同调", rarity: 2, explaination: "该地名称中有至少一字拼音声调与答案中某字声调相同"})
     })()
 
+    // 3. direction
+    ;(() => {
+        const [Np, Sp, Wp, Ep] = min_bound_box(p)
+        const [Na, Sa, Wa, Ea] = min_bound_box(answer)
+        Np < Sa ? tags.push({name: "偏南", rarity: 2, explaination: "该地在答案南边"}) :
+        Sp > Na ? tags.push({name: "偏北", rarity: 2, explaination: "该地在答案北边"}) :
+                  tags.push({name: "同纬", rarity: 3, explaination: "该地与答案纬度相近"})
+
+        Ep < Wa ? tags.push({name: "偏西", rarity: 2, explaination: "该地在答案西边"}) :
+        Wp > Ea ? tags.push({name: "偏东", rarity: 2, explaination: "该地在答案东边"}) :
+                  tags.push({name: "同经", rarity: 3, explaination: "该地与答案经度相近"})
+    })()
+
     return tags
 }
 
@@ -134,6 +147,17 @@ function distance(a, b) {
         }
     }
     return shortest
+}
+
+function min_bound_box(p) {
+    let N = -Infinity, S = Infinity, W = Infinity, E = -Infinity
+    for (const coordinate of p.geometry.coordinates) for (const [lon, lat] of coordinate) {
+        if (lat < S) S = lat
+        if (lat > N) N = lat
+        if (lon < W) W = lon
+        if (lon > E) E = lon
+    }
+    return [N, S, W, E]
 }
 
 function split_pinyin(pinyin) {
