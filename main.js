@@ -1,7 +1,7 @@
 const $ = document.querySelector.bind(document)
 
 const answer = places[(date => {
-    const x = date.getFullYear() * 7
+    const x = date.getFullYear() * 2
             + date.getMonth() * 14207929
             + date.getDay() * 36189529
     return (x * x) % 236573 * 287281 + x * 457979
