@@ -34,6 +34,8 @@ $("#submit").addEventListener("click", () => {
         const result_element = document.createElement("div")
         result_element.innerHTML = html.trim()
         $("#history").append(result_element)
+        $("#input").value = ""
+        $("#status").innerHTML = ""
     }
 })
 
@@ -48,6 +50,11 @@ $("#pixel").addEventListener("click", () => {
     }
 
     rep($("#history"))
+})
+
+$("#input").addEventListener("keydown", e => {
+    if (e.keyCode == 13)
+        $("#submit").click()
 })
 
 function get_tags(p) {

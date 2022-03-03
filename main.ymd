@@ -27,7 +27,7 @@ window.places = [require](places.json)
  
 <input id="input"></input>
 <button id="submit">提交</button>
-<p id="status"><p>
+<p id="status"></p>
 
 <button id="pixel" class="hidden">打码</button>
 
