@@ -30,6 +30,7 @@ window.places = [require](places.json)
 <p id="status"></p>
 
 <button id="pixel" class="hidden">打码</button>
+<button id="unpixel" class="hidden">取消打码</button>
 
 [require](main.js)
 
