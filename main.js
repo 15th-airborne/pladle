@@ -120,7 +120,7 @@ function get_tags(p) {
         }
 
         for (const pinyin of p.pinyin) if (answer.pinyin.includes(pinyin)) {
-            return tags.push({name: "同音", rarity: 3, explaination: "该地名称中有至少一字读音与答案中某字读音完全相同"})
+            return tags.push({name: "同拼音", rarity: 3, explaination: "该地名称中有至少一字拼音与答案中某字拼音完全相同(含声调)"})
         }
 
         let same_consonant = false, same_vowel = false, same_tone = false
@@ -135,11 +135,11 @@ function get_tags(p) {
                 same_tone = true
         }
         if (same_consonant)
-            return tags.push({name: "同声", rarity: 2, explaination: "该地名称中有至少一字拼音声母与答案中某字声母相同"})
+            tags.push({name: "同声母", rarity: 2, explaination: "该地名称中有至少一字拼音声母与答案中某字声母相同"})
         if (same_vowel)
-            return tags.push({name: "同韵", rarity: 2, explaination: "该地名称中有至少一字拼音韵母与答案中某字韵母相同"})
+            tags.push({name: "同韵母", rarity: 2, explaination: "该地名称中有至少一字拼音韵母与答案中某字韵母相同"})
         if (same_tone)
-            return tags.push({name: "同调", rarity: 2, explaination: "该地名称中有至少一字拼音声调与答案中某字声调相同"})
+            tags.push({name: "同声调", rarity: 2, explaination: "该地名称中有至少一字拼音声调与答案中某字声调相同"})
     })()
 
     // 3. direction
