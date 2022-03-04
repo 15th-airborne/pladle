@@ -33,7 +33,7 @@ $("#submit").addEventListener("click", () => {
     $("#history").append(get_history_element(p))
     
     $("#input").value = ""
-    $("#status").innerHTML = ""    
+    $("#status").innerHTML = ""
 })
 
 $("#pixel").addEventListener("click", () => {
@@ -47,10 +47,13 @@ $("#pixel").addEventListener("click", () => {
     }
 
     rep($("#history"))
+    $("#status").className = "hidden"
 })
 
 $("#unpixel").addEventListener("click", () => {
     load_history(guesses)
+    $("#status").innerHTML = ""
+    $("#status").className = ""
 })
 
 $("#input").addEventListener("keydown", e => {
