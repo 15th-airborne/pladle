@@ -1,11 +1,15 @@
 const $ = document.querySelector.bind(document)
 
+const load_time = new Date
+
 const answer = places[(date => {
     const x = date.getFullYear() * 2
             + date.getMonth() * 14207929
             + date.getDay() * 36189529
     return (x * x) % 236573 * 287281 + x * 457979
-})(new Date) % places.length]
+})(load_time) % places.length]
+
+const guesses = JSON.parse(window.localStorage?.getItem(load_time.toLocaleDateString()) ?? "[]")
 
 const place_index = {}
 for (place of places)
@@ -18,32 +22,25 @@ $("#submit").addEventListener("click", () => {
         return
     }
 
-    const tags = get_tags(p)
-
-    if (p.short_name == answer.short_name) {
-        const result_element = document.createElement("div")
-        result_element.innerHTML = `
-            <span class="guess">${p.short_name}</span> <span class="tag-4">猜对了！</span>
-        `.trim()
-        $("#history").append(result_element)
-        $("#pixel").className = ""
-    } else {
-        let html = `<span class="guess">${p.short_name}</span>`
-        for (const tag of tags)
-            html += ` <span class="tag-${tag.rarity}" title="${tag.explaination}">${tag.name}</span>`
-        const result_element = document.createElement("div")
-        result_element.innerHTML = html.trim()
-        $("#history").append(result_element)
-        $("#input").value = ""
-        $("#status").innerHTML = ""
+    if (guesses.includes(p.short_name)) {
+        $("#status").innerHTML = `猜过了`
+        return
     }
+
+    guesses.push(p.short_name)
+    window.localStorage?.setItem(load_time.toLocaleDateString(), JSON.stringify(guesses))
+
+    $("#history").append(get_history_element(p))
+    
+    $("#input").value = ""
+    $("#status").innerHTML = ""    
 })
 
 $("#pixel").addEventListener("click", () => {
     function rep(node) {
         for (const child of node.childNodes) {
             if (child.nodeName == "#text")
-                child.textContent = child.textContent.replace(/\S/g, "█")
+                child.textContent = child.textContent.slice(0, 2).replace(/\S/g, "█")
             else
                 rep(child)
         }
@@ -52,10 +49,43 @@ $("#pixel").addEventListener("click", () => {
     rep($("#history"))
 })
 
+$("#unpixel").addEventListener("click", () => {
+    load_history(guesses)
+})
+
 $("#input").addEventListener("keydown", e => {
     if (e.keyCode == 13)
         $("#submit").click()
 })
+
+$("#history").addEventListener("touchstart", e => {
+    if (!e.target.className.startsWith("tag-") || !e.target.title)
+        return
+
+    $("#status").innerHTML = `${e.target.textContent}: ${e.target.title}`
+})
+
+function get_history_element(p) {
+    const tags = get_tags(p)
+
+    const result_element = document.createElement("div")
+
+    if (p.short_name == answer.short_name) {
+        result_element.innerHTML = `
+            <span class="guess">${p.short_name}</span> <span class="tag-4">猜对了！</span>
+        `.trim()
+        $("#pixel").className = ""
+        $("#unpixel").className = ""
+        $("#submit").disabled = true
+    } else {
+        let html = `<span class="guess">${p.short_name}</span>`
+        for (const tag of tags)
+            html += ` <span class="tag-${tag.rarity}" title="${tag.explaination}">${tag.name}</span>`
+        result_element.innerHTML = html.trim()
+    }
+
+    return result_element
+}
 
 function get_tags(p) {
     let tags = []
@@ -125,6 +155,12 @@ function get_tags(p) {
     return tags
 }
 
+function load_history(guesses) {
+    $("#history").innerHTML = ""
+    for (const short_name of guesses) {
+        $("#history").append(get_history_element(place_index[short_name]))
+    }
+}
 
 // https://www.movable-type.co.uk/scripts/latlong.html
 function p2p_distance([lon1, lat1], [lon2, lat2]) {
@@ -174,3 +210,5 @@ function split_pinyin(pinyin) {
     const tone = pinyin[pinyin.length - 1]
     return { consonant, vowel, tone }
 }
+
+load_history(guesses)
