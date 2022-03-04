@@ -57,6 +57,13 @@ $("#input").addEventListener("keydown", e => {
         $("#submit").click()
 })
 
+$("#history").addEventListener("touchstart", e => {
+    if (!e.target.className.startsWith("tag-") || !e.target.title)
+        return
+
+    $("#status").innerHTML = `${e.target.textContent}: ${e.target.title}`
+})
+
 function get_tags(p) {
     let tags = []
 
