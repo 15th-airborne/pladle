@@ -1,6 +1,7 @@
 const $ = document.querySelector.bind(document)
 
 const load_time = new Date
+const load_date_str = (load_time).toLocaleDateString()
 
 const answer = places[(date => {
     const x = date.getFullYear() * 2
@@ -9,7 +10,11 @@ const answer = places[(date => {
     return (x * x) % 236573 * 287281 + x * 457979
 })(load_time) % places.length]
 
-const guesses = JSON.parse(window.localStorage?.getItem(load_time.toLocaleDateString()) ?? "[]")
+const records = JSON.parse(window.localStorage?.getItem("records") ?? "{}")
+
+if (!records[load_date_str])
+    records[load_date_str] = { guesses: [], answer: answer.short_name }
+const record_today = records[load_date_str]
 
 const place_index = {}
 for (place of places)
@@ -17,17 +22,15 @@ for (place of places)
 
 const status = {
     el: $("#status"),
-
     locked: false,
 
     set(msg) {
-        if (!this.locked) {
+        if (!this.locked)
             this.el.textContent = msg
-        }
     },
 
     lock() {
-        this.el.textContent = ""
+        this.clear()
         this.locked = true
     },
 
@@ -40,18 +43,75 @@ const status = {
     }
 }
 
+const stat = {
+    set_stat() {
+        const hist = []
+        
+        for (const date_str in records) if (records[date_str].finish_time)
+            hist.push(records[date_str])
+
+        if (hist.length == 0)
+            return
+
+        const avg_time = hist
+            .map(x => (x.finish_time - x.start_time) / 1000)
+            .reduce((x, y) => x + y)
+            / hist.length
+        const avg_guesses = hist
+            .map(x => x.guesses.length)
+            .reduce((x, y) => x + y)
+            / hist.length
+
+        $("#stat-hist").textContent = `您已完成 ${hist.length} 次，平均耗时 ${avg_time.toFixed(2)}s，平均猜测次数：${avg_guesses.toFixed(2)}（含猜中那次）`
+        $("#stat-hist").className = ""
+    },
+
+    start_ticking() {
+        if (this.ticking_handler)
+            return
+        
+        if (!record_today.start_time) {
+            record_today.start_time = +new Date
+            save_records()
+        }
+
+        this.ticking_handler = setInterval(this.tick.bind(this), 1000)
+        this.tick()
+    },
+
+    stop_ticking() {
+        if (!record_today.finish_time) {
+            record_today.finish_time = +new Date
+            save_records()
+        }
+
+        clearInterval(this.ticking_handler)
+        this.set_stat()
+    },
+
+    tick() {
+        const now = record_today.finish_time ?? +new Date
+        const seconds = Math.round((now - record_today.start_time) / 1000)
+        $("#time").textContent =
+            seconds > 3600 ? `>1h` :
+            seconds >   60 ? `${Math.floor(seconds / 60)}m${Math.floor(seconds % 60)}s` :
+                             `${seconds}s`
+        $("#stat-today").className = ""
+    },
+}
+
 $("#submit").addEventListener("click", () => {
     const p = place_index[$("#input").value]
     if (!p)
         return status.set(`查无此地。（提示：注意规则前两条）`)
 
-    if (guesses.includes(p.short_name))
+    if (record_today.guesses.includes(p.short_name))
         return status.set(`猜过了`)
 
-    guesses.push(p.short_name)
-    window.localStorage?.setItem(load_time.toLocaleDateString(), JSON.stringify(guesses))
+    record_today.guesses.push(p.short_name)
+    save_records()
 
-    $("#history").append(get_history_element(p))
+    put_history(p)
     
     $("#input").value = ""
     status.clear()
@@ -88,7 +148,11 @@ $("#history").addEventListener("touchstart", e => {
     status.set(`${e.target.textContent}: ${e.target.title}`)
 })
 
-function get_history_element(p) {
+function save_records() {
+    window.localStorage?.setItem("records", JSON.stringify(records))
+}
+
+function put_history(p) {
     const tags = get_tags(p)
 
     const result_element = document.createElement("div")
@@ -100,14 +164,16 @@ function get_history_element(p) {
         $("#pixel").className = ""
         $("#unpixel").className = ""
         $("#submit").disabled = true
+        stat.stop_ticking()
     } else {
         let html = `<span class="guess">${p.short_name}</span>`
         for (const tag of tags)
             html += ` <span class="tag-${tag.rarity}" title="${tag.explaination}">${tag.name}</span>`
         result_element.innerHTML = html.trim()
+        stat.start_ticking()
     }
 
-    return result_element
+    $("#history").append(result_element)
 }
 
 function get_tags(p) {
@@ -178,11 +244,10 @@ function get_tags(p) {
     return tags
 }
 
-function load_history(guesses) {
+function load_history() {
     $("#history").innerHTML = ""
-    for (const short_name of guesses) {
-        $("#history").append(get_history_element(place_index[short_name]))
-    }
+    for (const short_name of record_today.guesses)
+        put_history(place_index[short_name])
 }
 
 function* vertices(p) {
@@ -252,4 +317,5 @@ function split_pinyin(pinyin) {
     return { consonant, vowel, tone }
 }
 
-load_history(guesses)
+load_history()
+stat.set_stat()

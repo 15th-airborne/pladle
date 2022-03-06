@@ -33,7 +33,8 @@ window.places = [require](places.json)
 <button id="unpixel" class="hidden">取消打码</button>
 
 <div id="stat">
-
+    <div id="stat-today" class="hidden">耗时：<span id="time"></span></div>
+    <div id="stat-hist" class="hidden"></div>
 </div>
 
 [require](main.js)
