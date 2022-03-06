@@ -32,6 +32,10 @@ window.places = [require](places.json)
 <button id="pixel" class="hidden">打码</button>
 <button id="unpixel" class="hidden">取消打码</button>
 
+<div id="stat">
+
+</div>
+
 [require](main.js)
 
 [mixin] common.ymd

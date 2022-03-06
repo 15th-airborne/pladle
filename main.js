@@ -15,17 +15,38 @@ const place_index = {}
 for (place of places)
     place_index[place.short_name] = place
 
+const status = {
+    el: $("#status"),
+
+    locked: false,
+
+    set(msg) {
+        if (!this.locked) {
+            this.el.textContent = msg
+        }
+    },
+
+    lock() {
+        this.el.textContent = ""
+        this.locked = true
+    },
+
+    unlock() {
+        this.locked = false
+    },
+
+    clear() {
+        this.el.textContent = ""
+    }
+}
+
 $("#submit").addEventListener("click", () => {
     const p = place_index[$("#input").value]
-    if (!p) {
-        $("#status").innerHTML = `查无此地。（提示：注意规则前两条）`
-        return
-    }
+    if (!p)
+        return status.set(`查无此地。（提示：注意规则前两条）`)
 
-    if (guesses.includes(p.short_name)) {
-        $("#status").innerHTML = `猜过了`
-        return
-    }
+    if (guesses.includes(p.short_name))
+        return status.set(`猜过了`)
 
     guesses.push(p.short_name)
     window.localStorage?.setItem(load_time.toLocaleDateString(), JSON.stringify(guesses))
@@ -33,7 +54,7 @@ $("#submit").addEventListener("click", () => {
     $("#history").append(get_history_element(p))
     
     $("#input").value = ""
-    $("#status").innerHTML = ""
+    status.clear()
 })
 
 $("#pixel").addEventListener("click", () => {
@@ -47,13 +68,12 @@ $("#pixel").addEventListener("click", () => {
     }
 
     rep($("#history"))
-    $("#status").className = "hidden"
+    status.lock()
 })
 
 $("#unpixel").addEventListener("click", () => {
     load_history(guesses)
-    $("#status").innerHTML = ""
-    $("#status").className = ""
+    status.unlock()
 })
 
 $("#input").addEventListener("keydown", e => {
@@ -65,7 +85,7 @@ $("#history").addEventListener("touchstart", e => {
     if (!e.target.className.startsWith("tag-") || !e.target.title)
         return
 
-    $("#status").innerHTML = `${e.target.textContent}: ${e.target.title}`
+    status.set(`${e.target.textContent}: ${e.target.title}`)
 })
 
 function get_history_element(p) {
@@ -165,6 +185,24 @@ function load_history(guesses) {
     }
 }
 
+function* vertices(p) {
+    switch (p.geometry.type) {
+        case "MultiPolygon":
+            for (const polygon of p.geometry.coordinates)
+                for (const coordinate of polygon)
+                    for (const point of coordinate)
+                        yield point
+            break
+        case "Polygon":
+            for (const coordinate of p.geometry.coordinates)
+                for (const point of coordinate)
+                    yield point
+            break
+        default:
+            throw "unknown geometry type"
+    }
+}
+
 // https://www.movable-type.co.uk/scripts/latlong.html
 function p2p_distance([lon1, lat1], [lon2, lat2]) {
     const R = 6371
@@ -174,8 +212,8 @@ function p2p_distance([lon1, lat1], [lon2, lat2]) {
     const Δλ = (lon2-lon1) * Math.PI/180
 
     const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
-            Math.cos(φ1) * Math.cos(φ2) *
-            Math.sin(Δλ/2) * Math.sin(Δλ/2)
+              Math.cos(φ1) * Math.cos(φ2) *
+              Math.sin(Δλ/2) * Math.sin(Δλ/2)
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))
 
     return R * c
@@ -183,8 +221,8 @@ function p2p_distance([lon1, lat1], [lon2, lat2]) {
 
 function distance(a, b) {
     let shortest = Infinity
-    for (const coordinate_a of a.geometry.coordinates) for (const point_a of coordinate_a) {
-        for (const coordinate_b of b.geometry.coordinates) for (const point_b of coordinate_b) {
+    for (const point_a of vertices(a)) {
+        for (const point_b of vertices(b)) {
             const dist = p2p_distance(point_a, point_b)
             if (dist < 1)
                 return 0
@@ -197,7 +235,7 @@ function distance(a, b) {
 
 function min_bound_box(p) {
     let N = -Infinity, S = Infinity, W = Infinity, E = -Infinity
-    for (const coordinate of p.geometry.coordinates) for (const [lon, lat] of coordinate) {
+    for (const [lon, lat] of vertices(p)) {
         if (lat < S) S = lat
         if (lat > N) N = lat
         if (lon < W) W = lon
