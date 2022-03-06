@@ -132,7 +132,7 @@ $("#pixel").addEventListener("click", () => {
 })
 
 $("#unpixel").addEventListener("click", () => {
-    load_history(guesses)
+    load_history()
     status.unlock()
 })
 
