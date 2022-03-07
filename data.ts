@@ -11,8 +11,9 @@ const high_pop_list =
         .map(x => x[0])
 
 high_pop_list.push(
-    "北京市", "天津市", "上海市", "重庆市", "香港特别行政区",
-    "新北市", "台中市", "高雄市", "台北市", "桃园市", "台南市", "彰化县"
+    "北京市", "天津市", "上海市", "重庆市", "香港特别行政区", "澳门特别行政区",
+    "新北市", "台中市", "高雄市", "台北市", "桃园市", "台南市", "彰化县",
+    "三亚市", "西双版纳傣族自治州", "大理白族自治州"
 )
 
 const places: any[] = []
@@ -39,15 +40,17 @@ for (const file of [
 
 const places_short_name_index: Record<string, number> = {}
 for (const place of places) {
-    if (place.full_name.endsWith("市") || place.full_name.endsWith("县"))
-        place.short_name = place.full_name.slice(0, -1)
-    else if (place.full_name.endsWith("特别行政区"))
-        place.short_name = place.full_name.slice(0, -5)
-    else
-        throw "TODO"
+    const suffixes = ["市", "县", "特别行政区", "傣族自治州", "白族自治州"]
+    for (const suffix of suffixes) if (place.full_name.endsWith(suffix)) {
+        place.short_name = place.full_name.slice(0, -suffix.length)
+        break
+    }
+
+    if (!place.short_name)
+        throw "TODO: no suffix found for " + place.full_name
 
     if (places_short_name_index[place.short_name] != null)
-        throw "TODO"
+        throw "TODO: duplicated short name"
 
     places_short_name_index[place.short_name] = places_full_name_index[place.full_name]
 }
