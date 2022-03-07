@@ -13,7 +13,8 @@ const high_pop_list =
 high_pop_list.push(
     "北京市", "天津市", "上海市", "重庆市", "香港特别行政区", "澳门特别行政区",
     "新北市", "台中市", "高雄市", "台北市", "桃园市", "台南市", "彰化县",
-    "三亚市", "西双版纳傣族自治州", "大理白族自治州"
+    "三亚市", "防城港市", "西双版纳傣族自治州", "大理白族自治州", "伊犁哈萨克自治州",
+    "延边朝鲜族自治州", "锡林郭勒盟", "兴安盟"
 )
 
 const places: any[] = []
@@ -40,7 +41,7 @@ for (const file of [
 
 const places_short_name_index: Record<string, number> = {}
 for (const place of places) {
-    const suffixes = ["市", "县", "特别行政区", "傣族自治州", "白族自治州"]
+    const suffixes = ["市", "县", "盟", "特别行政区", "傣族自治州", "白族自治州", "哈萨克自治州", "朝鲜族自治州"]
     for (const suffix of suffixes) if (place.full_name.endsWith(suffix)) {
         place.short_name = place.full_name.slice(0, -suffix.length)
         break
