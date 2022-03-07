@@ -1,24 +1,24 @@
 const $ = document.querySelector.bind(document)
 
+const place_index = {}
+for (place of places)
+    place_index[place.short_name] = place
+
 const load_time = new Date
 const load_date_str = (load_time).toLocaleDateString()
 
-const answer = places[(date => {
+const records = JSON.parse(window.localStorage?.getItem("records") ?? "{}")
+
+const answer = records[load_date_str]?.answer ? place_index[records[load_date_str].answer] : places[(date => {
     const x = date.getFullYear() * 2
             + date.getMonth() * 14207929
             + date.getDay() * 36189529
     return (x * x) % 236573 * 287281 + x * 457979
 })(load_time) % places.length]
 
-const records = JSON.parse(window.localStorage?.getItem("records") ?? "{}")
-
 if (!records[load_date_str])
     records[load_date_str] = { guesses: [], answer: answer.short_name }
 const record_today = records[load_date_str]
-
-const place_index = {}
-for (place of places)
-    place_index[place.short_name] = place
 
 const status = {
     el: $("#status"),
