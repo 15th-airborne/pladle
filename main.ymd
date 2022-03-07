@@ -12,13 +12,18 @@ window.places = [require](places.json)
 </script>
 
 <p>
-规则:<br>
+规则：<br>
 1. 猜一个常住人口超过100万或其他作者认为有名的县级市及以上的地名；<br>
 2. 地名不包含作为后缀的“市”、“民族自治区”、“盟”等字；<br>
-3. 在猜错后会给出提示，例如该地与答案在地理位置和名称上的关系等，鼠标放在提示上会有详细说明(手机点击提示会在页面底部说明)；<br>
+3. 在猜错后会给出提示，例如该地与答案在地理位置和名称上的关系等，鼠标放在提示上会有详细说明（手机点击提示会在页面底部说明）；<br>
 4. 答案每日随机生成；<br>
-5. 所有数据来自互联网，不保证其准确性、完整性或时效性。<br>
+5. 所有数据来自互联网，不保证其准确性、完整性或时效性。<br><br>
+
+源码: [link](https://github.com/15th-airborne/pladle)
+<br>感谢yuanyuan补充的部分城市列表！<br><br>
+
 参考地图: [link](http://datav.aliyun.com/portal/school/atlas/area_selector)
+<br>
 </p>
 
 <div id="history">
