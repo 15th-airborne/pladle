@@ -86,6 +86,7 @@ const stat = {
         }
 
         clearInterval(this.ticking_handler)
+        this.tick()
         this.set_stat()
     },
 
@@ -177,37 +178,29 @@ function put_history(p) {
 }
 
 function get_tags(p) {
-    let tags = []
+    const tags = []
 
     // 1. distance
-    const dist = distance(p, answer)
-    console.log(dist)
-    switch (false) {
-        case !(dist < 1):
-            tags.push({name: "相邻", rarity: 4, explaination: "该地与答案有共同边界或重合（如行政区划级别不同）"})
-            break
-        case !(dist < 100):
-            tags.push({name: "很近", rarity: 3, explaination: "该地与答案直线距离小于 100 千米"})
-            break
-        case !(dist < 500):
-            tags.push({name: "较近", rarity: 2, explaination: "该地与答案直线距离小于 500 千米"})
-            break
-        case !(dist < 1000):
-            tags.push({name: "较远", rarity: 2, explaination: "该地与答案直线距离小于 1000 千米"})
-            break
-        default:
-            tags.push({name: "很远", rarity: 1, explaination: "该地与答案直线距离大于 1000 千米"})
-    }
+    ;(() => {
+        const dist = distance(p, answer)
+        if (dist < 1)
+            return tags.push({name: "相邻", rarity: 4, explaination: "该地与答案有共同边界或重合（如行政区划级别不同）"})
+        if (dist < 100)
+            return tags.push({name: "很近", rarity: 3, explaination: "该地与答案直线距离小于 100 千米"})
+        if (dist < 500)
+            return tags.push({name: "较近", rarity: 2, explaination: "该地与答案直线距离小于 500 千米"})
+        if (dist < 1000)
+            return tags.push({name: "较远", rarity: 2, explaination: "该地与答案直线距离小于 1000 千米"})
+        tags.push({name: "很远", rarity: 1, explaination: "该地与答案直线距离大于 1000 千米"})
+    })()
 
     // 2. name
     ;(() => {
-        for (const char of p.short_name) if (answer.short_name.includes(char)) {
+        for (const char of p.short_name) if (answer.short_name.includes(char))
             return tags.push({name: "同字", rarity: 4, explaination: "该地名称中有至少一字出现在答案中"})
-        }
 
-        for (const pinyin of p.pinyin) if (answer.pinyin.includes(pinyin)) {
+        for (const pinyin of p.pinyin) if (answer.pinyin.includes(pinyin))
             return tags.push({name: "同拼音", rarity: 3, explaination: "该地名称中有至少一字拼音与答案中某字拼音完全相同(含声调)"})
-        }
 
         let same_consonant = false, same_vowel = false, same_tone = false
         for (const pinyin of p.pinyin) for (const answer_pinyin of answer.pinyin) {
