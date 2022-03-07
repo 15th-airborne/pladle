@@ -55,4 +55,7 @@ for (const place of places) {
 for (const place of places)
     place.pinyin = pinyin(place.short_name, { heteronym: false, segment: true, style: pinyin.STYLE_TONE2 }).map(x => x[0])
 
+// Sort to ensure a consistent ordering. The indexes are invalided after sorting!
+places.sort((x, y) => x.short_name < y.short_name ? -1 : x.short_name == y.short_name ? 0 : 1)
+
 Deno.writeTextFileSync("places.json", JSON.stringify(places))
