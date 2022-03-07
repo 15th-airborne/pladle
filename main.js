@@ -46,7 +46,7 @@ const status = {
 const stat = {
     set_stat() {
         const hist = []
-        
+
         for (const date_str in records) if (records[date_str].finish_time)
             hist.push(records[date_str])
 
@@ -69,7 +69,7 @@ const stat = {
     start_ticking() {
         if (this.ticking_handler)
             return
-        
+
         if (!record_today.start_time) {
             record_today.start_time = +new Date
             save_records()
@@ -112,7 +112,7 @@ $("#submit").addEventListener("click", () => {
     save_records()
 
     put_history(p)
-    
+
     $("#input").value = ""
     status.clear()
 })
