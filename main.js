@@ -184,7 +184,7 @@ function get_tags(p) {
     console.log(dist)
     switch (false) {
         case !(dist < 1):
-            tags.push({name: "相邻", rarity: 4, explaination: "该地与答案有共同边界"})
+            tags.push({name: "相邻", rarity: 4, explaination: "该地与答案有共同边界或重合（如行政区划级别不同）"})
             break
         case !(dist < 100):
             tags.push({name: "很近", rarity: 3, explaination: "该地与答案直线距离小于 100 千米"})
